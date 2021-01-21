@@ -7,6 +7,7 @@ class Distribution:
     # make sure that sum of pdf's elements is 1
     def __init__(self, pdf):
         self.pdf = pdf.copy()
+        self.pdf /= np.sum(self.pdf)
         self.mu = np.sum(pdf * np.arange(len(pdf)))
         self.sigma = np.sqrt(np.sum((pdf * (np.arange(len(pdf)) - self.mu) ** 2)))
 
@@ -25,11 +26,7 @@ class Distribution:
 
     def add(self, other):
         pdf = np.convolve(self.pdf, other.pdf)
-        mu = np.sum(pdf * np.arange(len(pdf)))
-        sigma = np.sqrt(np.sum((pdf * (np.arange(len(pdf)) -mu) ** 2)))
-        res = Distribution.from_mu_sigma(mu, sigma, len(pdf))
-        res.pdf = pdf
-        return res
+        return Distribution(pdf)
 
     def max(self, other):
         cdf1 = self.pdf.copy()
@@ -51,11 +48,13 @@ class Distribution:
             pdf[u // k] += self.pdf[u]
         return Distribution(pdf)
 
-# a = Distribution.from_mu_sigma(5, 10)
-# b = Distribution.from_mu_sigma(10, 10)
-# c = Distribution.max(a, b)
+# a = Distribution.from_mu_sigma(10, 5)
+# # d = a.div(2)
+# b = Distribution.from_mu_sigma(10, 2)
+# c = Distribution.add(a, b)
 # plt.plot(c.pdf, label = "c")
 # plt.plot(a.pdf, label = "a")
+# # plt.plot(d.pdf, label = "d")
 # plt.plot(b.pdf, label = "b")
 # plt.legend()
 # plt.show()
