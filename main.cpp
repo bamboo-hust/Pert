@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <vector>
 #include <cmath>
 #include <fstream>
@@ -118,7 +119,9 @@ int n;
 void read_dist(const char* prefix) {
     node_dist.resize(n);
     for (int i = 1; i <= n; ++i) {
-        std::ifstream fin(prefix);
+        std::string distfile = std::string(prefix) + "dist" + std::to_string(i) + ".txt";
+        std::cerr << "read_dist " << distfile << std::endl;
+        std::ifstream fin(distfile);
         int x; double f;
         Distribution &dist = node_dist[i - 1];
         while (fin >> x >> f) {
@@ -221,9 +224,10 @@ std::vector< std::pair< std::vector<int>, Distribution> >  solve() {
 
 int main(int argc, char* argv[]) {
     read_relations(argv[1]); 
-    read_dist("dist2.txt");
+    read_dist("out/");
     std::vector< std::pair< std::vector<int>, Distribution> > result = solve();
 
+    Distribution disttill = {1};
     for (const auto &g : result) {
         for (int v : g.first) {
             std::cout << v << ' ';
@@ -233,8 +237,15 @@ int main(int argc, char* argv[]) {
             std::cout << std::setprecision(6) << std::fixed << v << ' ';
         }
         std::cout << std::endl;
+        disttill = disttill + g.second;
+        for (double v : disttill) {
+            std::cout << std::setprecision(6) << std::fixed << v << ' ';
+        }
+
+        std::cout << std::endl;
         std::cerr << std::accumulate(g.second.begin(), g.second.end(), 0.0) << std::endl;
     }
+    std::cerr << "Mean = " << disttill.mean() << std::endl;
     return 0;
 }
 
