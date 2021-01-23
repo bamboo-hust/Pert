@@ -39,7 +39,7 @@ class AnnoteFinder:  # thanks to http://www.scipy.org/Cookbook/Matplotlib/Intera
     def drawAnnote(self, axis, x, y, annote):
         if (dist_sum[annote] == 0):
             fig1, ax1 = plt.subplots()
-            ax1.set_title('Sprint')
+            ax1.set_title('Module')
             ax1.plot(dist_all[annote]);
         else:
             fig1, ax = plt.subplots(2)
