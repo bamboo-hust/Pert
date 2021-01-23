@@ -4,6 +4,7 @@ import graphistry
 from pylab import *
 import pandas as pd
 from constant import *
+from reader import *
 
 class AnnoteFinder:  # thanks to http://www.scipy.org/Cookbook/Matplotlib/Interactive_Plotting
     """
@@ -27,45 +28,55 @@ class AnnoteFinder:  # thanks to http://www.scipy.org/Cookbook/Matplotlib/Intera
             clickY = event.ydata
             #print(dir(event),event.key)
             if self.axis is None or self.axis==event.inaxes:
-                annotes = []
                 smallest_x_dist = float('inf')
                 smallest_y_dist = float('inf')
 
                 for x,y,a in self.data:
-                    print(clickX, x, clickY, y);
+                    # print(clickX, x, clickY, y);
                     if abs(clickX-x) <= RADIUS and abs(clickY-y) <= RADIUS:
                         dx, dy = x - clickX, y - clickY
-                        annotes.append((dx*dx+dy*dy,x,y, a))
                         self.drawAnnote(event.inaxes, x, y, a)
     def drawAnnote(self, axis, x, y, annote):
-        result = [1, 2, 3];
-        fig1, ax1 = plt.subplots()
-        ax1.plot(np.arange(3), result);
+        if (dist_sum[annote] == 0):
+            fig1, ax1 = plt.subplots()
+            ax1.set_title('Sprint')
+            ax1.plot(dist_all[annote]);
+        else:
+            fig1, ax = plt.subplots(2)
+            ax[0].set_title('Sprint')
+            ax[0].plot(dist_all[annote]);
+            ax[1].set_title('Cumulative sprint')
+            ax[1].plot(dist_sum[annote]);
         plt.show();
 
+dist_all = [0] * 17
+dist_sum = [0] * 17
 
-df = pd.read_csv("edges.csv") #DataFrame("edges.csv")
+def draw_origin_graph():
+    global distribution
+    G = read_graph('module_relations.txt')
+    color_map = ['black'] * 16
+    for i in range(1, 13):
+        dist_all[i] = read_dist_from_file("out/dist" + str(i) + ".txt");
+    read_result('result.txt', G, color_map, dist_all, dist_sum)
+    pos = read_pos('pos.txt')
+    options = {
+        'arrowstyle': '-|>',
+        'arrowsize': 12,
+    }
+    nx.draw_networkx(G,pos,arrows=True, **options, node_color = color_map)
+    labels = nx.get_edge_attributes(G,'weight')
+    nx.draw_networkx_edge_labels(G, pos, edge_labels = labels)
+    x, y, annotes = [], [], []
+    for key in pos:
+        d = pos[key]
+        annotes.append(key)
+        x.append(d[0])
+        y.append(d[1])
 
-# Build your graph
-# G = nx.from_pandas_edgelist(df, 'from', 'to')
-G = nx.Graph()
-G.add_edge(1,2,weight=0.5)
-G.add_edge(1,3,weight=9.8)
-pos=nx.spring_layout(G)
-nx.draw_networkx(G,pos)
-labels = nx.get_edge_attributes(G,'weight')
-nx.draw_networkx_edge_labels(G,pos,edge_labels=labels)
-x, y, annotes = [], [], []
-for key in pos:
-    d = pos[key]
-    annotes.append(key)
-    x.append(d[0])
-    y.append(d[1])
+    af = AnnoteFinder(x, y, annotes)
+    connect('button_press_event', af)
+    show()
 
 
-
-
-af = AnnoteFinder(x, y, annotes)
-connect('button_press_event', af)
-
-show()
+draw_origin_graph()
