@@ -52,7 +52,7 @@ def read_result(file_name, G, color_map, dist_all, dist_sum):
 			G.add_edge(prev, new_node)
 		color_map[new_node - 1] = COLOR_STRING[color_id]
 		prev = new_node
-		line = line.replace("\n", "")
+		line = line.rstrip().replace("\n", "")
 		numbers = line.split(" ");
 		for number in numbers:
 			number = int(number)
