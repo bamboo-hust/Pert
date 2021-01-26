@@ -9,7 +9,7 @@
 #include <numeric>
 
 const double INF = 1e18;
-const int GROUP_LIMIT = 3;
+int GROUP_LIMIT = 3;
 const int NUM_TEAM = 4;
 const int DIST_SIZE = 30;
 
@@ -242,13 +242,14 @@ std::vector< std::pair< std::vector<int>, Distribution> > read_result(std::strin
 }
 
 int main(int argc, char* argv[]) {
-    read_relations(argv[1]); 
+    GROUP_LIMIT = atoi(argv[1]);
+    read_relations(argv[2]); 
     read_dist("out/");
 
     std::vector< std::pair< std::vector<int>, Distribution> > result;
 
-    if (argc > 2) {
-        result = read_result(argv[2]);       
+    if (argc > 3) {
+        result = read_result(argv[3]);       
     } else {
         result = solve();
     }
