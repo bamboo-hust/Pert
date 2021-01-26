@@ -5,6 +5,8 @@
 1. `out/dist{ID}.txt` file: each line contains `x` and `f(x)`, distribution of each
    module (identified by module ID), where `x` is the number of days and `f(x)`
    is the probability that the module is finished in exactly `x` days.
+
+   This is the output of old project's java code.
 2. `module_relations.txt`: edge list of dependency graph, each line contains `u
    v w` corresponding to a directed edge `u->v` with weight `w`.
 3. (Optional) `result_group.txt`, each line describes a group by a list of
