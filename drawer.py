@@ -58,23 +58,29 @@ class AnnoteFinder:  # thanks to http://www.scipy.org/Cookbook/Matplotlib/Intera
             plt.tight_layout()
         plt.show();
 
-dist_all = [0] * 17
-dist_sum = [0] * 17
+dist_all = []
+dist_sum = []
 G = nx.Graph()
 
 def draw_origin_graph():
-    global distribution, G
+    global distribution, G, dist_sum, dist_all
     G = read_graph('module_relations.txt')
-    color_map = ['black'] * 16
+    color_map = ['black'] * len(G.nodes())
+    dist_all = [0] * (len(G.nodes()) + 1)
+    dist_sum = [0] * (len(G.nodes()) + 1)
     for i in range(1, 13):
         dist_all[i] = read_dist_from_file("out/dist" + str(i) + ".txt");
-    read_result('result.txt', G, color_map, dist_all, dist_sum)
+    read_result('result_group.txt', 'result_dist.txt', G, color_map, dist_all, dist_sum)
     pos = read_pos('pos.txt')
     options = {
         'arrowstyle': '-|>',
         'arrowsize': 12,
     }
-    nx.draw_networkx(G,pos,arrows=True, **options, node_color = color_map)
+    fig, ax = plt.subplots(figsize=(12, 12))
+    # Title/legend
+    font = {"fontname": "Helvetica", "color": "k", "fontweight": "bold", "fontsize": 14}
+    ax.set_title("The graph of module relations and sprint relations\n(Modules have the same color are belong to the sprint which has that color)", font)
+    nx.draw_networkx(G, pos, arrows=True, **options, node_color = color_map, label = 'Concurrent module relations')
     labels = nx.get_edge_attributes(G,'weight')
     nx.draw_networkx_edge_labels(G, pos, edge_labels = labels)
     x, y, annotes = [], [], []
@@ -83,7 +89,6 @@ def draw_origin_graph():
         annotes.append(key)
         x.append(d[0])
         y.append(d[1])
-
     af = AnnoteFinder(x, y, annotes)
     connect('button_press_event', af)
     show()

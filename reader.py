@@ -37,14 +37,22 @@ def get_array(line):
 			break;
 	return sum
 
-def read_result(file_name, G, color_map, dist_all, dist_sum):
-	f = open(file_name, "r")
+def read_result(result_group, result_dist, G, color_map, dist_all, dist_sum):
+	f_group = open(result_group, "r")
+	f_dist = open(result_dist, "r")
+	num_groups = sum(1 for line in open(result_group))
+	for i in range(num_groups):
+		color_map.append('black')
+		dist_sum.append(0)
+		dist_all.append(0)
+	print(len(color_map))
+
 	color_id = 0
 	list_node = list(G.nodes())
 	prev = -1
 	new_node = chr(ord('A') - 1)
 	while (1):
-		line = f.readline()
+		line = f_group.readline()
 		if (len(line) == 0):
 			break;
 		new_node = chr(ord(new_node) + 1)
@@ -56,13 +64,12 @@ def read_result(file_name, G, color_map, dist_all, dist_sum):
 		line = line.rstrip().replace("\n", "")
 		numbers = line.split(" ");
 		for number in numbers:
-			# number = int(number)
 			index = list_node.index(number)
 			color_map[index] = COLOR_STRING[color_id]
 		color_id = color_id + 1
-		line = f.readline()
+		line = f_dist.readline()
 		dist_all[new_node_id] = get_array(line)
-		line = f.readline()
+		line = f_dist.readline()
 		dist_sum[new_node_id] = get_array(line)
 	print(color_map)
 
@@ -95,12 +102,11 @@ def read_pos(file_name):
 		numbers = line.split(" ")
 		y = 1
 		if (len(numbers) == 1):
-			y = 0
+			y = -1
 		step = 0
 		if (len(numbers) > 1):
 			step = 2 / (len(numbers) - 1)
 		for number in numbers:
-			# number = int(number)
 			pos[number] = [x, y]
 			y -= step
 		x += 0.4
